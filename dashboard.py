@@ -6,6 +6,18 @@ from datetime import datetime
 
 # === THIS MUST BE FIRST ===
 st.set_page_config(page_title="Logger Health Dashboard", layout="wide")
+# --- BRANDED HEADER ---
+logo_path = "logo.png"  # Make sure this file exists in your project folder
+
+st.markdown("""
+    <div style='display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;'>
+        <div style='display: flex; align-items: center;'>
+            <img src='logo.png' style='height: 50px; margin-right: 15px;' />
+            <h1 style='margin: 0; color: #333;'>Anoushka Kadam</h1>
+        </div>
+        <p style='margin: 0; font-size: 16px; color: #666;'>Logger Health Monitoring Dashboard</p>
+    </div>
+""", unsafe_allow_html=True)
 
 # === AUTO REFRESH ===
 st.query_params.update(run=str(datetime.now()))
