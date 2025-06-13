@@ -4,7 +4,7 @@ A Streamlit-based dashboard for monitoring the health and performance of industr
 
 ## 🌐 Live App
 
-View App Here [Logger Health Dashboard](https://share.streamlit.io/):
+View App Here [Logger Health Dashboard](https://logger-health-dashboard-anoushkakadam.streamlit.app/?run=2025-06-13+11%3A23%3A58.609591)
 
 ## 🔧 Features
 
