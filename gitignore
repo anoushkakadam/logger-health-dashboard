@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Streamlit temporary files
+.streamlit/
+
+# Environment variables / secrets
+.env
+.env.*
+
+# OS files
+.DS_Store
+
+# Logs or output
+run_report.csv
+*.log
+
+# Virtual environment folders
+venv/
+env/
