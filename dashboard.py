@@ -4,23 +4,20 @@ import altair as alt
 import json
 from datetime import datetime
 
-# === PAGE CONFIG ===
+# === THIS MUST BE FIRST ===
 st.set_page_config(page_title="Logger Health Dashboard", layout="wide")
 
-# === BRAND HEADER ===
-col_logo, col_title = st.columns([1, 5])
-with col_logo:
-    st.image("logo.png", width=60)  # Make sure logo.png is in the same folder
-with col_title:
-    st.markdown("## Anoushka Kadam")
-    st.caption("Logger Health Monitoring Dashboard")
-
-# === AUTO REFRESH EVERY 30s ===
+# === AUTO REFRESH ===
 st.query_params.update(run=str(datetime.now()))
-st.markdown("<meta http-equiv='refresh' content='30'>", unsafe_allow_html=True)
+st.markdown(
+    "<meta http-equiv='refresh' content='30'>",
+    unsafe_allow_html=True
+)
 
-# === TITLE & PROJECT DESCRIPTION ===
+# === TITLE ===
 st.title("📊 Data Logger Health Dashboard")
+
+# === PROJECT DESCRIPTION ===
 st.markdown("""
 This dashboard is part of a predictive maintenance project designed to monitor and evaluate the health of industrial data loggers.
 
@@ -34,27 +31,28 @@ The system runs periodic health checks and feeds results into this visual interf
 """)
 
 try:
-    # === LOAD DATA ===
+    # === LOAD LOGGER LOCATION DATA ===
     with open("loggers_config.json") as f:
         logger_meta = pd.DataFrame(json.load(f))
 
+    # === LOAD HEALTH CHECK LOG DATA ===
     df = pd.read_csv("run_report.csv", names=["Timestamp", "Logger ID", "Status", "Message"])
     df["Timestamp"] = pd.to_datetime(df["Timestamp"])
     df = df.sort_values(by="Timestamp", ascending=False)
 
-    # === FILTER: DATE RANGE ===
-    st.markdown("### 📆 Filter Logs by Date Range")
+    # === DATE FILTER ===
+    st.markdown("### 🗓️ Filter Logs by Date Range")
     min_date = df["Timestamp"].min().date()
     max_date = df["Timestamp"].max().date()
     start_date, end_date = st.date_input("Select date range", [min_date, max_date])
     df = df[(df["Timestamp"].dt.date >= start_date) & (df["Timestamp"].dt.date <= end_date)]
 
     # === METRICS ===
-    st.markdown("### 📊 Overview")
+    st.markdown("### 🔍 Overview")
     col1, col2, col3 = st.columns(3)
-    col1.metric("🖥️ Total Loggers", df["Logger ID"].nunique())
+    col1.metric("🖥️ Loggers Checked", df["Logger ID"].nunique())
     col2.metric("📄 Total Checks", len(df))
-    col3.metric("❌ Failures", (df["Status"] == "FAIL").sum())
+    col3.metric("❌ Fails", (df["Status"] == "FAIL").sum())
 
     # === STATUS SUMMARY CHART ===
     st.markdown("### ✅ Status Summary")
@@ -69,8 +67,8 @@ try:
         use_container_width=True
     )
 
-    # === TREND CHART ===
-    st.markdown("### 📈 Health Check Trend Over Time")
+    # === TREND LINE CHART ===
+    st.markdown("### 📈 Health Checks Over Time")
     trend = df.groupby([df["Timestamp"].dt.date, "Status"]).size().reset_index(name="Count")
     st.altair_chart(
         alt.Chart(trend).mark_line(point=True).encode(
@@ -81,31 +79,32 @@ try:
         use_container_width=True
     )
 
-    # === LATEST ENTRIES TABLE ===
-    st.markdown("### 📋 Recent Log Entries")
+    # === LATEST LOGS TABLE ===
+    st.markdown("### 📋 Latest Log Entries")
     df_display = df.head(20).copy()
     df_display["Status"] = df_display["Status"].apply(
         lambda x: f"🟢 {x}" if x == "PASS" else f"🔴 {x}"
     )
     st.dataframe(df_display, use_container_width=True)
 
-    # === LOGGER FILTER & DOWNLOAD ===
-    st.markdown("### 🔍 Analyze by Logger")
+    # === LOGGER-WISE FILTER AND DOWNLOAD ===
+    st.markdown("### 🧠 Analyze by Logger")
     logger_ids = df["Logger ID"].unique()
-    selected = st.selectbox("Select Logger", logger_ids)
+    selected = st.selectbox("Select a Logger", logger_ids)
+
     filtered_df = df[df["Logger ID"] == selected]
-    st.dataframe(filtered_df, use_container_width=True)
+    st.write(filtered_df)
 
     st.download_button(
-        label="⬇️ Download CSV for Selected Logger",
+        label="⬇️ Download Selected Logger Logs as CSV",
         data=filtered_df.to_csv(index=False),
         file_name=f"{selected}_logs.csv",
         mime="text/csv"
     )
 
-    # === MAP VIEW ===
+    # === LOGGER MAP VIEW ===
     st.markdown("### 🗺️ Logger Locations")
     st.map(logger_meta.rename(columns={"lat": "latitude", "lon": "longitude"}))
 
 except FileNotFoundError:
-    st.warning("⚠️ Missing file: Ensure `run_report.csv` and `loggers_config.json` exist in the folder.")
+    st.warning("⚠️ Missing file: Make sure both `run_report.csv` and `loggers_config.json` are in the project folder.")
