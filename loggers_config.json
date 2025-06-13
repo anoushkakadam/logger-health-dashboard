@@ -1,0 +1,5 @@
+[
+  { "logger_id": "DL001", "location": "Pune Plant", "lat": 18.5204, "lon": 73.8567 },
+  { "logger_id": "DL002", "location": "Nashik Plant", "lat": 20.0110, "lon": 73.7900 },
+  { "logger_id": "DL003", "location": "Mumbai Plant", "lat": 19.0760, "lon": 72.8777 }
+]
